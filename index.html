@@ -693,12 +693,27 @@ function initGoogleAuth() {
     callback: (resp) => {
       if (resp.error) { setSyncStatus('error', 'Error auth'); return; }
       S.token = resp.access_token;
+      // Token vence en 1 hora — renovar automáticamente
+      setTimeout(() => { S.token = null; }, 55 * 60 * 1000);
       setSyncStatus('ok', 'Conectado');
       document.getElementById('connStatus').textContent = '✓ OK';
+      // Si veníamos de un intento de sync, completarlo
+      if (S._pendingSync) { S._pendingSync = false; writeToSheet(); return; }
+      if (S._pendingLoad) { S._pendingLoad = false; loadFromSheet(); return; }
       showScreen('inicio');
       loadFromSheet();
     }
   });
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+function requestTokenThen(action) {
+  // Si ya hay token válido, ejecutar directo
+  if (S.token) { action(); return; }
+  // Si no hay token, pedir uno nuevo y ejecutar después
+  if (!tokenClient) { showToast('Configurá la conexión primero', 'error'); return; }
+  if (action === 'sync') S._pendingSync = true;
+  if (action === 'load') S._pendingLoad = true;
   tokenClient.requestAccessToken({ prompt: '' });
 }
 
@@ -1046,7 +1061,7 @@ async function sheetsRequest(method, path, body) {
 }
 
 async function writeToSheet() {
-  if (!S.token) return;
+  if (!S.token) { requestTokenThen('sync'); return; }
   setSyncStatus('loading', 'Sincronizando...');
   try {
     // Write sueldos y mes
@@ -1105,7 +1120,7 @@ async function writeToSheet() {
 }
 
 async function loadFromSheet() {
-  if (!S.token || !S.sheetId) return;
+  if (!S.token) { requestTokenThen('load'); return; }
   setSyncStatus('loading', 'Cargando...');
   const res = await sheetsRequest('GET',
     `/values:batchGet?ranges=${encodeURIComponent(RANGES.mes)}&ranges=${encodeURIComponent(RANGES.danteSueldo)}&ranges=${encodeURIComponent(RANGES.nicoleSueldo)}&ranges=${encodeURIComponent(RANGES.tarjetaReal)}`
