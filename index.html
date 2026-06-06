@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="D&N"/>
+<link rel="manifest" href="manifest.json"/>
+<title>D&N Finanzas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #0a0a0f;
+  --s1:       #12121a;
+  --s2:       #1c1c27;
+  --border:   rgba(255,255,255,0.08);
+  --text:     #f2f1fa;
+  --muted:    #6b6a80;
+  --dante:    #60a5fa;
+  --dante-bg: rgba(96,165,250,0.1);
+  --nicole:   #f472b6;
+  --nicole-bg:rgba(244,114,182,0.1);
+  --accent:   #c084fc;
+  --green:    #34d399;
+  --green-bg: rgba(52,211,153,0.1);
+  --amber:    #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --red:      #f87171;
+  --red-bg:   rgba(248,113,113,0.1);
+  --r:        18px;
+  --safe-t:   env(safe-area-inset-top,0px);
+  --safe-b:   env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;overscroll-behavior:none}
+
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;height:100dvh;max-width:420px;margin:0 auto}
+
+.topbar{
+  padding:calc(var(--safe-t) + 12px) 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);background:var(--bg);
+  position:sticky;top:0;z-index:50;
+}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.logo em{font-style:italic;color:var(--accent)}
+.sync-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:5px 10px;background:var(--s1);border:1px solid var(--border);border-radius:100px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.spin{background:var(--amber);animation:pulse 1s infinite}
+.sync-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.content{flex:1;overflow-y:auto;padding:16px 16px calc(72px + var(--safe-b))}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:420px;
+  background:rgba(18,18,26,0.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  padding:8px 0 calc(var(--safe-b) + 8px);
+  display:flex;justify-content:space-around;z-index:50;
+}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 12px;border-radius:12px;transition:color .2s}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav-btn.on{color:var(--accent)}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.on{display:block;animation:up .22s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--s1),#16162a);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 20px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.hero::after{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(192,132,252,.08),transparent 70%)}
+.hero-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.hero-big{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* ── BALANCE PILL ── */
+.balance{width:100%;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:100px;font-size:14px;font-weight:500;margin-bottom:12px;border:1px solid}
+.balance.ok{background:var(--green-bg);color:var(--green);border-color:rgba(52,211,153,.2)}
+.balance.dante-owe{background:var(--dante-bg);color:var(--dante);border-color:rgba(96,165,250,.2)}
+.balance.nicole-owe{background:var(--nicole-bg);color:var(--nicole);border-color:rgba(244,114,182,.2)}
+.balance.neutral{background:var(--s1);color:var(--muted);border-color:var(--border)}
+
+/* ── PERSON SPLIT ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.person-card{padding:14px;border-radius:14px;border:1px solid}
+.person-card.d{background:var(--dante-bg);border-color:rgba(96,165,250,.2)}
+.person-card.n{background:var(--nicole-bg);border-color:rgba(244,114,182,.2)}
+.pc-name{font-size:11px;font-weight:600;letter-spacing:.06em;margin-bottom:6px}
+.d .pc-name{color:var(--dante)}.n .pc-name{color:var(--nicole)}
+.pc-amt{font-family:'Playfair Display',serif;font-size:22px;font-weight:700}
+.pc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.prog{height:4px;border-radius:2px;background:var(--s2);margin-top:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.d .prog-fill{background:var(--dante)}.n .prog-fill{background:var(--nicole)}
+
+/* ── TX LIST ── */
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px}
+.tx-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-desc{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.tx-amt{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;flex-shrink:0}
+.tx-amt.d{color:var(--dante)}.tx-amt.n{color:var(--nicole)}.tx-amt.t{color:var(--accent)}
+
+/* ── FORMS ── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Outfit',sans-serif;-webkit-appearance:none;transition:border-color .2s}
+.fi:focus{outline:none;border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+select.fi{cursor:pointer}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .15s}
+.chip.on-d{background:var(--dante-bg);color:var(--dante);border-color:rgba(96,165,250,.3)}
+.chip.on-n{background:var(--nicole-bg);color:var(--nicole);border-color:rgba(244,114,182,.3)}
+.chip.on-a{background:rgba(192,132,252,.12);color:var(--accent);border-color:rgba(192,132,252,.3)}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:15px;border-radius:14px;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;border:none;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--accent);color:#0a0a0f}
+.btn-p:active{transform:scale(.98);opacity:.9}
+.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-s{background:var(--s2);color:var(--text);border:1px solid var(--border);margin-bottom:8px}
+
+/* ── CAT GRID ── */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.cat-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;border:1px solid var(--border);background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s}
+.cat-btn .ce{font-size:22px}
+.cat-btn.on{background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.3);color:var(--accent)}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(68px + var(--safe-b) + 10px);right:calc(50% - 200px + 16px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#0a0a0f;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(192,132,252,.35);transition:all .15s;z-index:40}
+.fab:active{transform:scale(.92)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.on{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--safe-b)+20px);width:100%;max-width:420px;max-height:92dvh;overflow-y:auto;transform:translateY(30px);transition:transform .3s}
+.overlay.on .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+
+/* ── SETTING ROWS ── */
+.sr{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.sr:last-child{border-bottom:none}
+.sr-label{font-size:14px}
+.sr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sr-val{font-size:14px;color:var(--accent);font-weight:500}
+
+/* ── TARJETA TOGGLE ── */
+.check-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--s2);border-radius:12px;border:1px solid var(--border);margin-bottom:8px}
+.check-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.check-desc{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.check-meta{font-size:11px;color:var(--muted)}
+.check-amt{font-size:14px;font-weight:600;margin-right:10px;flex-shrink:0}
+.toggle{width:42px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;background:var(--s1);border:1px solid var(--border);flex-shrink:0}
+.toggle.on{background:var(--green);border-color:var(--green)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.toggle.on::after{transform:translateX(18px);background:#fff}
+
+/* ── SETUP ── */
+.setup-hero{text-align:center;padding:48px 20px 28px}
+.setup-icon{font-family:'Playfair Display',serif;font-size:56px;font-style:italic;color:var(--accent);line-height:1;margin-bottom:12px}
+.setup-title{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:8px}
+.setup-sub{color:var(--muted);font-size:14px;line-height:1.6}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.step-n{width:26px;height:26px;border-radius:50%;background:rgba(192,132,252,.15);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;line-height:1.6;color:var(--muted)}
+.step-t strong{color:var(--text)}
+.step-t a{color:var(--accent);text-decoration:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(72px + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--s1);border:1px solid var(--border);border-radius:100px;padding:9px 18px;font-size:13px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;z-index:300}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(52,211,153,.3);color:var(--green)}
+.toast.err{border-color:rgba(248,113,113,.3);color:var(--red)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-txt{font-size:13px;line-height:1.6}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:4px 0 14px}
+
+/* ── TARJETA CIERRE ── */
+.cierre-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cierre-card{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.cierre-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.cierre-amt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">D<em>&</em>N</div>
+    <div class="sync-badge"><div class="sync-dot" id="syncDot"></div><span id="syncLbl">Conectado</span></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- SETUP -->
+    <div class="screen on" id="sc-setup">
+      <div class="setup-hero">
+        <div class="setup-icon">D&N</div>
+        <div class="setup-title">Finanzas en pareja</div>
+        <div class="setup-sub">Conectá la app con tu Google Sheet para que todo se sincronice automáticamente.</div>
+      </div>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Entrá a <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a>, creá un proyecto y habilitá la <strong>Google Sheets API</strong>.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">En <strong>Credenciales → Crear credencial → ID de cliente OAuth</strong>, elegí "Aplicación web" y agregá tu URL como origen autorizado.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Copiá el <strong>Client ID</strong> y el <strong>ID de tu Google Sheet</strong> (está en la URL entre <code>/d/</code> y <code>/edit</code>).</div></div>
+      <div style="height:16px"></div>
+      <div class="fg"><label>Google Client ID</label><input class="fi" id="setupCid" placeholder="xxxxx.apps.googleusercontent.com"/></div>
+      <div class="fg"><label>ID del Google Sheet</label><input class="fi" id="setupSid" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"/></div>
+      <button class="btn btn-p" onclick="doSetup()">Conectar y comenzar</button>
+    </div>
+
+    <!-- INICIO -->
+    <div class="screen" id="sc-inicio">
+      <div class="hero">
+        <div class="hero-label">Total gastos del mes</div>
+        <div class="hero-big" id="hTotal">$0</div>
+        <div class="hero-sub" id="hPeriod">–</div>
+      </div>
+      <div class="balance neutral" id="balancePill"><span id="balanceIco">⚖️</span><span id="balanceTxt">Calculando...</span></div>
+      <div class="split">
+        <div class="person-card d">
+          <div class="pc-name">DANTE</div>
+          <div class="pc-amt" id="dPago">$0</div>
+          <div class="pc-sub">pagó</div>
+          <div class="prog"><div class="prog-fill" id="dBar" style="width:0%"></div></div>
+        </div>
+        <div class="person-card n">
+          <div class="pc-name">NICOLE</div>
+          <div class="pc-amt" id="nPago">$0</div>
+          <div class="pc-sub">pagó</div>
+          <div class="prog"><div class="prog-fill" id="nBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="sh"><span class="sh-title">Últimos movimientos</span></div>
+      <div class="tx-list" id="recentList"></div>
+    </div>
+
+    <!-- GASTOS -->
+    <div class="screen" id="sc-gastos">
+      <div class="sh" style="margin-bottom:14px">
+        <span class="sh-title">Todos los gastos</span>
+        <div class="chips" style="gap:6px">
+          <div class="chip on-a" id="fAll" onclick="setFilter('all')">Todos</div>
+          <div class="chip" id="fD" onclick="setFilter('dante')">Dante</div>
+          <div class="chip" id="fN" onclick="setFilter('nicole')">Nicole</div>
+        </div>
+      </div>
+      <div class="tx-list" id="gastosList"></div>
+    </div>
+
+    <!-- TARJETA -->
+    <div class="screen" id="sc-tarjeta">
+      <!-- Resumen rápido -->
+      <div class="cierre-row">
+        <div class="cierre-card">
+          <div class="cierre-label">Cargado</div>
+          <div class="cierre-amt" id="tCargado">$0</div>
+        </div>
+        <div class="cierre-card">
+          <div class="cierre-label">Total real</div>
+          <input class="fi" id="tReal" type="number" placeholder="0" style="font-family:'Playfair Display',serif;font-size:20px;padding:4px 8px;height:auto;background:transparent;border-color:var(--accent)" oninput="onTarjetaReal(this.value)"/>
+        </div>
+      </div>
+
+      <!-- Forma de pago -->
+      <div class="card">
+        <div class="card-label">¿Cómo se paga el resumen?</div>
+        <div class="chips" style="margin-bottom:14px">
+          <div class="chip" id="fp-d" onclick="setFormaPago('dante')">Dante pagó todo</div>
+          <div class="chip" id="fp-n" onclick="setFormaPago('nicole')">Nicole pagó todo</div>
+          <div class="chip" id="fp-p" onclick="setFormaPago('partes')">Cada uno una parte</div>
+        </div>
+        <div id="partesBlock" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="fg" style="margin-bottom:0">
+              <label>Dante pagó ($)</label>
+              <input class="fi" id="dPagoTarjeta" type="number" placeholder="0" oninput="onPagoTarjeta()"/>
+            </div>
+            <div class="fg" style="margin-bottom:0">
+              <label>Nicole pagó ($)</label>
+              <input class="fi" id="nPagoTarjeta" type="number" placeholder="0" oninput="onPagoTarjeta()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Le toca a cada uno -->
+      <div class="split">
+        <div class="person-card d">
+          <div class="pc-name">DANTE</div>
+          <div class="pc-amt" id="tDante">$0</div>
+          <div class="pc-sub">le toca</div>
+        </div>
+        <div class="person-card n">
+          <div class="pc-name">NICOLE</div>
+          <div class="pc-amt" id="tNicole">$0</div>
+          <div class="pc-sub">le toca</div>
+        </div>
+      </div>
+
+      <!-- Lista gastos tarjeta -->
+      <div class="sh"><span class="sh-title">Gastos cargados</span></div>
+      <div id="tarjetaList"></div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="screen" id="sc-resumen">
+      <div class="hero" style="margin-bottom:12px">
+        <div class="hero-label">Balance del mes</div>
+        <div class="hero-big" id="resAmt" style="font-size:28px;line-height:1.2">–</div>
+        <div class="hero-sub" id="resSub">–</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Por categoría</div>
+        <div id="resCats"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Sueldos</div>
+        <div class="sr"><div><div class="sr-label">Dante</div><div class="sr-sub" id="resDpct">–</div></div><div class="sr-val" id="resDsueldo">$0</div></div>
+        <div class="sr"><div><div class="sr-label">Nicole</div><div class="sr-sub" id="resNpct">–</div></div><div class="sr-val" id="resNsueldo">$0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Detalle de pagos</div>
+        <div class="sr"><div><div class="sr-label">Dante pagó</div><div class="sr-sub">le correspondía <span id="resDdebe">$0</span></div></div><div class="sr-val" id="resDpago">$0</div></div>
+        <div class="sr"><div><div class="sr-label">Nicole pagó</div><div class="sr-sub">le correspondía <span id="resNdebe">$0</span></div></div><div class="sr-val" id="resNpago">$0</div></div>
+      </div>
+
+      <!-- Saldo mes anterior -->
+      <div class="card">
+        <div class="card-label">Saldo mes anterior</div>
+        <div class="sr">
+          <div class="sr-label">Dante le debe a Nicole</div>
+          <input class="fi" id="saldoDA" type="number" placeholder="0" style="width:120px;text-align:right;font-size:14px;padding:6px 10px" oninput="onSaldoAnt()"/>
+        </div>
+        <div class="sr">
+          <div class="sr-label">Nicole le debe a Dante</div>
+          <input class="fi" id="saldoNA" type="number" placeholder="0" style="width:120px;text-align:right;font-size:14px;padding:6px 10px" oninput="onSaldoAnt()"/>
+        </div>
+      </div>
+
+      <button class="btn btn-s" onclick="loadFromSheet()">🔄 Actualizar desde Sheet</button>
+      <button class="btn btn-p" onclick="writeToSheet()">↑ Sincronizar con Drive</button>
+    </div>
+
+    <!-- AJUSTES -->
+    <div class="screen" id="sc-ajustes">
+      <div class="card">
+        <div class="card-label">Sueldos</div>
+        <div class="fg"><label>Sueldo Dante ($)</label><input class="fi" id="ajD" type="number" oninput="onSueldo()"/></div>
+        <div class="fg" style="margin-bottom:0"><label>Sueldo Nicole ($)</label><input class="fi" id="ajN" type="number" oninput="onSueldo()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Período</div>
+        <div class="fg" style="margin-bottom:0"><label>Mes actual</label><input class="fi" id="ajMes" placeholder="Junio 2026" oninput="onMes()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Conexión</div>
+        <div class="sr"><div><div class="sr-label">Google Sheet</div><div class="sr-sub" id="sheetDisp">–</div></div><div class="sr-val" id="connSt">–</div></div>
+        <div class="sr"><div><div class="sr-label">Cuenta Google</div><div class="sr-sub" id="googleUser">No conectado</div></div><button class="btn btn-s" style="width:auto;padding:7px 14px;font-size:12px;margin:0" onclick="reconnect()">Reconectar</button></div>
+      </div>
+      <button class="btn btn-p" onclick="writeToSheet()">↑ Sincronizar con Drive</button>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openModal()" style="display:none">+</button>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn on" id="nb-inicio" onclick="go('inicio')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio
+    </button>
+    <button class="nav-btn" id="nb-gastos" onclick="go('gastos')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Gastos
+    </button>
+    <button class="nav-btn" id="nb-tarjeta" onclick="go('tarjeta')">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="7" cy="15" r="1" fill="currentColor"/></svg>Tarjeta
+    </button>
+    <button class="nav-btn" id="nb-resumen" onclick="go('resumen')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Resumen
+    </button>
+    <button class="nav-btn" id="nb-ajustes" onclick="go('ajustes')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ajustes
+    </button>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MODAL NUEVO GASTO -->
+  <div class="overlay" id="overlay" onclick="closeOverlay(event)">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nuevo gasto</div>
+      <div class="fg">
+        <label>Tipo</label>
+        <div class="chips">
+          <div class="chip" id="tp-fijo" onclick="setTipo('fijo')">📌 Fijo</div>
+          <div class="chip" id="tp-variable" onclick="setTipo('variable')">🔄 Variable</div>
+          <div class="chip" id="tp-diario" onclick="setTipo('diario')">🛒 Diario</div>
+          <div class="chip" id="tp-tarjeta" onclick="setTipo('tarjeta')">💳 Tarjeta</div>
+        </div>
+      </div>
+      <div class="fg"><label>Descripción</label><input class="fi" id="mDesc" placeholder="Ej: Supermercado" autocomplete="off"/></div>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-btn" onclick="setCat('🛒','Supermercado')"><span class="ce">🛒</span>Super</div>
+        <div class="cat-btn" onclick="setCat('🍽️','Restaurante')"><span class="ce">🍽️</span>Resto</div>
+        <div class="cat-btn" onclick="setCat('🏠','Hogar')"><span class="ce">🏠</span>Hogar</div>
+        <div class="cat-btn" onclick="setCat('💡','Servicios')"><span class="ce">💡</span>Servicios</div>
+        <div class="cat-btn" onclick="setCat('🚗','Transporte')"><span class="ce">🚗</span>Transporte</div>
+        <div class="cat-btn" onclick="setCat('🎬','Entrete.')"><span class="ce">🎬</span>Entrete.</div>
+        <div class="cat-btn" onclick="setCat('🏥','Salud')"><span class="ce">🏥</span>Salud</div>
+        <div class="cat-btn" onclick="setCat('✈️','Viajes')"><span class="ce">✈️</span>Viajes</div>
+        <div class="cat-btn on" onclick="setCat('📦','Otros')"><span class="ce">📦</span>Otros</div>
+      </div>
+      <div class="fg" id="pagadorFg">
+        <label>¿Quién pagó?</label>
+        <div class="chips">
+          <div class="chip on-d" id="pg-dante" onclick="setPag('Dante')">Dante</div>
+          <div class="chip" id="pg-nicole" onclick="setPag('Nicole')">Nicole</div>
+        </div>
+      </div>
+      <div class="fg"><label>Monto ($)</label><input class="fi" id="mMonto" type="number" placeholder="0" style="font-size:24px;font-family:'Playfair Display',serif"/></div>
+      <div class="fg"><label>Fecha</label><input class="fi" id="mFecha" type="date"/></div>
+      <button class="btn btn-p" onclick="saveGasto()">Guardar</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S = {
+  clientId:    localStorage.getItem('cid') || '',
+  sheetId:     localStorage.getItem('sid') || '',
+  token:       localStorage.getItem('token') || null,
+  tokenExp:    parseInt(localStorage.getItem('tokenExp') || '0'),
+  gastos:      JSON.parse(localStorage.getItem('gastos') || '[]'),
+  tarjeta:     JSON.parse(localStorage.getItem('tarjeta') || '[]'),
+  tarjetaReal: parseFloat(localStorage.getItem('tReal') || '0'),
+  formaPago:   localStorage.getItem('formaPago') || 'dante',
+  dPagoTarjeta: parseFloat(localStorage.getItem('dPagoTarjeta') || '0'),
+  nPagoTarjeta: parseFloat(localStorage.getItem('nPagoTarjeta') || '0'),
+  sueldos:     JSON.parse(localStorage.getItem('sueldos') || '{"d":1000000,"n":500000}'),
+  mes:         localStorage.getItem('mes') || 'Junio 2026',
+  saldoDA:     parseFloat(localStorage.getItem('saldoDA') || '0'),
+  saldoNA:     parseFloat(localStorage.getItem('saldoNA') || '0'),
+  screen:      'setup',
+  filter:      'all',
+  ng:          { tipo:'diario', cat:'📦', catLabel:'Otros', pag:'Dante' },
+  _psync:      false, _pload: false,
+};
+
+const fmt = n => '$' + Math.round(n||0).toLocaleString('es-AR');
+const today = () => new Date().toISOString().split('T')[0];
+const pct = () => {
+  const t = S.sueldos.d + S.sueldos.n;
+  return t > 0 ? { d: S.sueldos.d/t, n: S.sueldos.n/t } : { d:.5, n:.5 };
+};
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+let tokenClient;
+
+function doSetup() {
+  const cid = document.getElementById('setupCid').value.trim();
+  const sid = document.getElementById('setupSid').value.trim();
+  if (!cid || !sid) { toast('Completá los dos campos','err'); return; }
+  S.clientId = cid; S.sheetId = sid;
+  localStorage.setItem('cid', cid); localStorage.setItem('sid', sid);
+  initAuth();
+}
+
+function initAuth() {
+  if (!S.clientId) return;
+  const checkGSI = setInterval(() => {
+    if (!window.google?.accounts?.oauth2) return;
+    clearInterval(checkGSI);
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: S.clientId,
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: resp => {
+        if (resp.error) { setSS('err','Error auth'); return; }
+        S.token = resp.access_token;
+        S.tokenExp = Date.now() + 55*60*1000;
+        localStorage.setItem('token', S.token);
+        localStorage.setItem('tokenExp', S.tokenExp);
+        setSS('ok','Conectado');
+        document.getElementById('connSt').textContent = '✓ OK';
+        fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+S.token)
+          .then(r=>r.json()).then(d=>{ document.getElementById('googleUser').textContent = d.email||'Conectado'; }).catch(()=>{});
+        if (S._psync) { S._psync=false; writeToSheet(); return; }
+        if (S._pload) { S._pload=false; loadFromSheet(); return; }
+        go('inicio'); loadFromSheet();
+      }
+    });
+    if (S.token && Date.now() < S.tokenExp) {
+      go('inicio');
+    } else {
+      tokenClient.requestAccessToken({ prompt:'' });
+    }
+  }, 150);
+}
+
+function ensureToken(then) {
+  if (S.token && Date.now() < S.tokenExp) { then(); return; }
+  if (!tokenClient) { toast('Reconectá en Ajustes','err'); return; }
+  S._psync = (then === 'sync');
+  S._pload = (then === 'load');
+  if (then !== 'sync' && then !== 'load') {
+    const orig = then;
+    tokenClient._cb_override = orig;
+  }
+  tokenClient.requestAccessToken({ prompt:'' });
+}
+
+function reconnect() {
+  if (!tokenClient) { initAuth(); return; }
+  tokenClient.requestAccessToken({ prompt:'select_account' });
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function go(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sc-'+name).classList.add('on');
+  const nb = document.getElementById('nb-'+name);
+  if (nb) nb.classList.add('on');
+  S.screen = name;
+  const fab = document.getElementById('fab');
+  fab.style.display = ['inicio','gastos','tarjeta'].includes(name) ? 'flex' : 'none';
+  if (name==='inicio')  renderInicio();
+  if (name==='gastos')  renderGastos();
+  if (name==='tarjeta') renderTarjeta();
+  if (name==='resumen') renderResumen();
+  if (name==='ajustes') renderAjustes();
+}
+
+// ═══════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════
+function openModal() {
+  document.getElementById('mDesc').value='';
+  document.getElementById('mMonto').value='';
+  document.getElementById('mFecha').value=today();
+  setTipo(S.screen==='tarjeta'?'tarjeta':'diario');
+  setCat('📦','Otros');
+  setPag('Dante');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('on'); }
+function closeOverlay(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function setTipo(t) {
+  S.ng.tipo=t;
+  ['fijo','variable','diario','tarjeta'].forEach(x=>{
+    document.getElementById('tp-'+x).className='chip'+(x===t?' on-a':'');
+  });
+  document.getElementById('pagadorFg').style.display = t==='tarjeta'?'none':'block';
+}
+function setCat(e,l) {
+  S.ng.cat=e; S.ng.catLabel=l;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+}
+function setPag(p) {
+  S.ng.pag=p;
+  document.getElementById('pg-dante').className='chip'+(p==='Dante'?' on-d':'');
+  document.getElementById('pg-nicole').className='chip'+(p==='Nicole'?' on-n':'');
+}
+
+// ═══════════════════════════════════════════════
+// SAVE GASTO
+// ═══════════════════════════════════════════════
+function saveGasto() {
+  const desc = document.getElementById('mDesc').value.trim();
+  const monto = parseFloat(document.getElementById('mMonto').value)||0;
+  const fecha = document.getElementById('mFecha').value;
+  if (!desc||monto<=0) { toast('Completá descripción y monto','err'); return; }
+  const g = { id:Date.now(), desc, monto, fecha, tipo:S.ng.tipo, cat:S.ng.cat, catLabel:S.ng.catLabel,
+    pagador: S.ng.tipo==='tarjeta'?'Tarjeta':S.ng.pag, consolidado:false };
+  if (g.tipo==='tarjeta') { S.tarjeta.push(g); localStorage.setItem('tarjeta',JSON.stringify(S.tarjeta)); }
+  else { S.gastos.push(g); localStorage.setItem('gastos',JSON.stringify(S.gastos)); }
+  closeModal(); toast('Guardado ✓','ok');
+  writeToSheetD();
+  if (S.screen==='inicio') renderInicio();
+  if (S.screen==='gastos') renderGastos();
+  if (S.screen==='tarjeta') renderTarjeta();
+}
+
+// ═══════════════════════════════════════════════
+// TARJETA
+// ═══════════════════════════════════════════════
+function setFormaPago(fp) {
+  S.formaPago = fp;
+  localStorage.setItem('formaPago', fp);
+  ['d','n','p'].forEach(x => document.getElementById('fp-'+x).className='chip');
+  document.getElementById('fp-'+fp[0]).className='chip on-a';
+  document.getElementById('partesBlock').style.display = fp==='partes'?'block':'none';
+  calcTarjetaPagos();
+  writeToSheetD();
+}
+
+function onTarjetaReal(v) {
+  S.tarjetaReal = parseFloat(v)||0;
+  localStorage.setItem('tReal', S.tarjetaReal);
+  calcTarjetaPagos();
+  if (S.screen==='tarjeta') renderTarjetaSplit();
+  writeToSheetD();
+}
+
+function onPagoTarjeta() {
+  S.dPagoTarjeta = parseFloat(document.getElementById('dPagoTarjeta').value)||0;
+  S.nPagoTarjeta = parseFloat(document.getElementById('nPagoTarjeta').value)||0;
+  localStorage.setItem('dPagoTarjeta', S.dPagoTarjeta);
+  localStorage.setItem('nPagoTarjeta', S.nPagoTarjeta);
+  writeToSheetD();
+}
+
+function calcTarjetaPagos() {
+  const p = pct();
+  const base = S.tarjetaReal;
+  if (S.formaPago==='dante') {
+    S.dPagoTarjeta = base; S.nPagoTarjeta = 0;
+  } else if (S.formaPago==='nicole') {
+    S.dPagoTarjeta = 0; S.nPagoTarjeta = base;
+  }
+  // partes: usar lo que ingresaron manualmente
+}
+
+function onSaldoAnt() {
+  S.saldoDA = parseFloat(document.getElementById('saldoDA').value)||0;
+  S.saldoNA = parseFloat(document.getElementById('saldoNA').value)||0;
+  localStorage.setItem('saldoDA', S.saldoDA);
+  localStorage.setItem('saldoNA', S.saldoNA);
+  writeToSheetD();
+}
+
+function onSueldo() {
+  S.sueldos.d = parseFloat(document.getElementById('ajD').value)||0;
+  S.sueldos.n = parseFloat(document.getElementById('ajN').value)||0;
+  localStorage.setItem('sueldos', JSON.stringify(S.sueldos));
+  writeToSheetD();
+}
+
+function onMes() {
+  S.mes = document.getElementById('ajMes').value;
+  localStorage.setItem('mes', S.mes);
+  writeToSheetD();
+}
+
+// ═══════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════
+function setFilter(f) {
+  S.filter=f;
+  ['All','D','N'].forEach(x=>{
+    const id='f'+x; const el=document.getElementById(id);
+    const v=x==='All'?'all':x==='D'?'dante':'nicole';
+    el.className='chip'+(v===f?' on-'+(v==='all'?'a':v==='dante'?'d':'n'):'');
+  });
+  renderGastos();
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderInicio() {
+  const p = pct();
+  const totalG = S.gastos.reduce((a,g)=>a+g.monto,0);
+  const tReal = S.tarjetaReal||0;
+  const dPag = S.gastos.filter(g=>g.pagador==='Dante').reduce((a,g)=>a+g.monto,0) + (S.dPagoTarjeta||0);
+  const nPag = S.gastos.filter(g=>g.pagador==='Nicole').reduce((a,g)=>a+g.monto,0) + (S.nPagoTarjeta||0);
+  const dDebe = totalG*p.d + tReal*p.d + (S.saldoDA||0) - (S.saldoNA||0);
+  const nDebe = totalG*p.n + tReal*p.n + (S.saldoNA||0) - (S.saldoDA||0);
+  const diff = dPag - dDebe;
+
+  document.getElementById('hTotal').textContent = fmt(totalG + tReal);
+  document.getElementById('hPeriod').textContent = S.mes + (tReal>0?' · Tarjeta incluida':'');
+  document.getElementById('dPago').textContent = fmt(dPag);
+  document.getElementById('nPago').textContent = fmt(nPag);
+  const mx = Math.max(dPag,nPag,1);
+  document.getElementById('dBar').style.width=(dPag/mx*100)+'%';
+  document.getElementById('nBar').style.width=(nPag/mx*100)+'%';
+
+  const pill=document.getElementById('balancePill');
+  const txt=document.getElementById('balanceTxt');
+  if (Math.abs(diff)<1) {
+    pill.className='balance ok'; txt.textContent='✓ Todo equilibrado este mes';
+  } else if (diff>0) {
+    pill.className='balance nicole-owe'; txt.textContent=`Nicole le debe a Dante ${fmt(diff)}`;
+  } else {
+    pill.className='balance dante-owe'; txt.textContent=`Dante le debe a Nicole ${fmt(Math.abs(diff))}`;
+  }
+
+  const recent=[...S.gastos].sort((a,b)=>b.id-a.id).slice(0,8);
+  const list=document.getElementById('recentList');
+  list.innerHTML = recent.length ? recent.map(txHtml).join('') :
+    '<div class="empty"><div class="empty-ico">🌿</div><div class="empty-txt">Sin gastos todavía.<br>Tocá + para agregar.</div></div>';
+}
+
+function txHtml(g) {
+  const cls=g.pagador==='Dante'?'d':g.pagador==='Nicole'?'n':'t';
+  const bg={'d':'var(--dante-bg)','n':'var(--nicole-bg)','t':'rgba(192,132,252,.1)'};
+  return `<div class="tx">
+    <div class="tx-ico" style="background:${bg[cls]}">${g.cat}</div>
+    <div class="tx-info">
+      <div class="tx-desc">${g.desc}</div>
+      <div class="tx-meta">${g.pagador} · ${g.catLabel} · ${g.fecha?g.fecha.slice(5).replace('-','/'):'–'}</div>
+    </div>
+    <div class="tx-amt ${cls}">${fmt(g.monto)}</div>
+  </div>`;
+}
+
+function renderGastos() {
+  let items=[...S.gastos].sort((a,b)=>b.id-a.id);
+  if (S.filter==='dante') items=items.filter(g=>g.pagador==='Dante');
+  if (S.filter==='nicole') items=items.filter(g=>g.pagador==='Nicole');
+  const el=document.getElementById('gastosList');
+  el.innerHTML=items.length?items.map(txHtml).join(''):
+    '<div class="empty"><div class="empty-ico">💸</div><div class="empty-txt">Sin gastos con este filtro.</div></div>';
+}
+
+function renderTarjeta() {
+  const total=S.tarjeta.reduce((a,g)=>a+g.monto,0);
+  document.getElementById('tCargado').textContent=fmt(total);
+  document.getElementById('tReal').value=S.tarjetaReal||'';
+  // Forma de pago
+  ['d','n','p'].forEach(x=>document.getElementById('fp-'+x).className='chip');
+  const fp=S.formaPago==='dante'?'d':S.formaPago==='nicole'?'n':'p';
+  document.getElementById('fp-'+fp).className='chip on-a';
+  document.getElementById('partesBlock').style.display=S.formaPago==='partes'?'block':'none';
+  if (S.formaPago==='partes') {
+    document.getElementById('dPagoTarjeta').value=S.dPagoTarjeta||'';
+    document.getElementById('nPagoTarjeta').value=S.nPagoTarjeta||'';
+  }
+  renderTarjetaSplit();
+  // Lista
+  const list=document.getElementById('tarjetaList');
+  if (!S.tarjeta.length) {
+    list.innerHTML='<div class="empty"><div class="empty-ico">💳</div><div class="empty-txt">Sin gastos con tarjeta todavía.</div></div>';
+    return;
+  }
+  list.innerHTML=S.tarjeta.sort((a,b)=>b.id-a.id).map(g=>`
+    <div class="check-row">
+      <div class="check-left">
+        <span style="font-size:20px">${g.cat}</span>
+        <div style="min-width:0">
+          <div class="check-desc">${g.desc}</div>
+          <div class="check-meta">${g.catLabel} · ${g.fecha?g.fecha.slice(5).replace('-','/'):'–'}</div>
+        </div>
+      </div>
+      <span class="check-amt">${fmt(g.monto)}</span>
+      <button class="toggle ${g.consolidado?'on':''}" onclick="toggleCons(${g.id})"></button>
+    </div>`).join('');
+}
+
+function renderTarjetaSplit() {
+  const p=pct();
+  const base=S.tarjetaReal||S.tarjeta.reduce((a,g)=>a+g.monto,0);
+  document.getElementById('tDante').textContent=fmt(base*p.d);
+  document.getElementById('tNicole').textContent=fmt(base*p.n);
+}
+
+function toggleCons(id) {
+  const g=S.tarjeta.find(x=>x.id===id);
+  if(g){g.consolidado=!g.consolidado;localStorage.setItem('tarjeta',JSON.stringify(S.tarjeta));renderTarjeta();}
+}
+
+function renderResumen() {
+  const p=pct();
+  const totalG=S.gastos.reduce((a,g)=>a+g.monto,0);
+  const tReal=S.tarjetaReal||0;
+  const dPag=S.gastos.filter(g=>g.pagador==='Dante').reduce((a,g)=>a+g.monto,0)+(S.dPagoTarjeta||0);
+  const nPag=S.gastos.filter(g=>g.pagador==='Nicole').reduce((a,g)=>a+g.monto,0)+(S.nPagoTarjeta||0);
+  const dDebe=totalG*p.d+tReal*p.d+(S.saldoDA||0)-(S.saldoNA||0);
+  const nDebe=totalG*p.n+tReal*p.n+(S.saldoNA||0)-(S.saldoDA||0);
+  const diff=dPag-dDebe;
+
+  const amt=document.getElementById('resAmt');
+  const sub=document.getElementById('resSub');
+  if(Math.abs(diff)<1){amt.textContent='✓ Equilibrado';amt.style.color='var(--green)';sub.textContent='Dante y Nicole están al día';}
+  else if(diff>0){amt.textContent=fmt(diff);amt.style.color='var(--nicole)';sub.textContent='Nicole le debe a Dante';}
+  else{amt.textContent=fmt(Math.abs(diff));amt.style.color='var(--dante)';sub.textContent='Dante le debe a Nicole';}
+
+  document.getElementById('resDsueldo').textContent=fmt(S.sueldos.d);
+  document.getElementById('resNsueldo').textContent=fmt(S.sueldos.n);
+  document.getElementById('resDpct').textContent=(p.d*100).toFixed(1)+'% del hogar';
+  document.getElementById('resNpct').textContent=(p.n*100).toFixed(1)+'% del hogar';
+  document.getElementById('resDpago').textContent=fmt(dPag);
+  document.getElementById('resNpago').textContent=fmt(nPag);
+  document.getElementById('resDdebe').textContent=fmt(dDebe);
+  document.getElementById('resNdebe').textContent=fmt(nDebe);
+
+  // Saldo anterior
+  document.getElementById('saldoDA').value=S.saldoDA||'';
+  document.getElementById('saldoNA').value=S.saldoNA||'';
+
+  // Categorías
+  const cats={};
+  S.gastos.forEach(g=>{if(!cats[g.catLabel])cats[g.catLabel]={e:g.cat,t:0};cats[g.catLabel].t+=g.monto;});
+  if(tReal>0)cats['Tarjeta']={e:'💳',t:tReal};
+  document.getElementById('resCats').innerHTML=Object.entries(cats).sort((a,b)=>b[1].t-a[1].t)
+    .map(([k,v])=>`<div class="sr" style="padding:10px 0"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">${v.e}</span><span style="font-size:14px">${k}</span></div><span style="font-size:14px;font-weight:600;color:var(--accent)">${fmt(v.t)}</span></div>`).join('')
+    ||'<div style="color:var(--muted);font-size:13px;padding:8px 0">Sin datos todavía</div>';
+}
+
+function renderAjustes() {
+  document.getElementById('ajD').value=S.sueldos.d||'';
+  document.getElementById('ajN').value=S.sueldos.n||'';
+  document.getElementById('ajMes').value=S.mes;
+  document.getElementById('sheetDisp').textContent=S.sheetId?S.sheetId.slice(0,22)+'...':'No configurado';
+  document.getElementById('connSt').textContent=S.token?'✓ Activo':'✗ Sin token';
+}
+
+// ═══════════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════
+function setSS(state,label) {
+  const dot=document.getElementById('syncDot');
+  dot.className='sync-dot'+(state==='spin'?' spin':state==='err'?' err':'');
+  document.getElementById('syncLbl').textContent=label;
+}
+
+async function apiCall(method,path,body) {
+  if(!S.token||!S.sheetId) return null;
+  try {
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${S.sheetId}${path}`,{
+      method, headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json'},
+      body:body?JSON.stringify(body):undefined
+    });
+    if(r.status===401){S.token=null;S.tokenExp=0;setSS('err','Sesión expirada');return null;}
+    return await r.json();
+  } catch(e){setSS('err','Sin internet');return null;}
+}
+
+async function writeToSheet() {
+  if(!S.token||Date.now()>S.tokenExp){S._psync=true;if(tokenClient)tokenClient.requestAccessToken({prompt:''});else initAuth();return;}
+  if(!S.sheetId){toast('Configurá el Sheet primero','err');return;}
+  setSS('spin','Sincronizando...');
+  const base='https://sheets.googleapis.com/v4/spreadsheets/'+S.sheetId;
+  const h={'Authorization':'Bearer '+S.token,'Content-Type':'application/json'};
+  async function post(ep,body){const r=await fetch(base+ep,{method:'POST',headers:h,body:JSON.stringify(body)});return r.json();}
+  try {
+    const fp=S.formaPago==='dante'?'Dante pago todo':S.formaPago==='nicole'?'Nicole pago todo':'Cada uno pago una parte';
+    const d=[
+      {range:"'💰 Sueldos'!B5",  values:[[S.mes]]},
+      {range:"'💰 Sueldos'!B9",  values:[[S.sueldos.d]]},
+      {range:"'💰 Sueldos'!B10", values:[[S.sueldos.n]]},
+      {range:"'💰 Sueldos'!B24", values:[[S.saldoDA||0]]},
+      {range:"'💰 Sueldos'!B25", values:[[S.saldoNA||0]]},
+      {range:"'💳 Tarjeta'!B43", values:[[S.tarjetaReal||'']]},
+      {range:"'💳 Tarjeta'!B56", values:[[fp]]},
+    ];
+    if(S.formaPago==='partes'){
+      d.push({range:"'💳 Tarjeta'!C59",values:[[S.dPagoTarjeta||'']]});
+      d.push({range:"'💳 Tarjeta'!C60",values:[[S.nPagoTarjeta||'']]});
+    }
+    await post('/values:batchUpdate',{valueInputOption:'RAW',data:d});
+    await post('/values:batchClear',{ranges:[
+      "'📌 Gastos Fijos'!A4:C23",
+      "'🔄 Gastos Variables'!A4:C23",
+      "'🛒 Gastos Diarios'!A4:C23",
+      "'💳 Tarjeta'!A6:E35"
+    ]});
+    const wd=[];
+    const tm={fijo:"'📌 Gastos Fijos'",variable:"'🔄 Gastos Variables'",diario:"'🛒 Gastos Diarios'"};
+    for(const [tipo,sn] of Object.entries(tm)){
+      const items=S.gastos.filter(g=>g.tipo===tipo);
+      if(items.length) wd.push({range:sn+'!A4',values:items.slice(0,20).map(g=>[g.desc,g.pagador,g.monto])});
+    }
+    if(S.tarjeta.length) wd.push({range:"'💳 Tarjeta'!A6",values:S.tarjeta.slice(0,30).map(g=>[
+      g.fecha?g.fecha.slice(5).replace('-','/'):'',g.desc,g.catLabel,g.monto,g.consolidado?'Si':'Pendiente'
+    ])});
+    if(wd.length) await post('/values:batchUpdate',{valueInputOption:'RAW',data:wd});
+    setSS('ok','Sincronizado');
+    toast('Drive actualizado ✓','ok');
+  } catch(e){setSS('err','Error al sincronizar');toast('Error al sincronizar','err');}
+}
+
+async function loadFromSheet() {
+  if(!S.token||Date.now()>S.tokenExp){S._pload=true;if(tokenClient)tokenClient.requestAccessToken({prompt:''});else initAuth();return;}
+  if(!S.sheetId) return;
+  setSS('spin','Cargando...');
+  const base='https://sheets.googleapis.com/v4/spreadsheets/'+S.sheetId+'/values/';
+  const h={'Authorization':'Bearer '+S.token};
+  async function getVal(range){
+    try{const r=await fetch(base+encodeURIComponent(range),{headers:h});const d=await r.json();return d.values?.[0]?.[0]||null;}catch(e){return null;}
+  }
+  try{
+    const [vMes,vDs,vNs,vDA,vNA,vTR,vFP]=await Promise.all([
+      getVal("'💰 Sueldos'!B5"),
+      getVal("'💰 Sueldos'!B9"),
+      getVal("'💰 Sueldos'!B10"),
+      getVal("'💰 Sueldos'!B24"),
+      getVal("'💰 Sueldos'!B25"),
+      getVal("'💳 Tarjeta'!B43"),
+      getVal("'💳 Tarjeta'!B56"),
+    ]);
+    if(vMes) S.mes=vMes;
+    if(vDs) S.sueldos.d=parseFloat(vDs)||S.sueldos.d;
+    if(vNs) S.sueldos.n=parseFloat(vNs)||S.sueldos.n;
+    S.saldoDA=parseFloat(vDA)||0;
+    S.saldoNA=parseFloat(vNA)||0;
+    S.tarjetaReal=parseFloat(vTR)||0;
+    if(vFP) S.formaPago=vFP.includes('Nicole')?'nicole':vFP.includes('parte')?'partes':'dante';
+    localStorage.setItem('sueldos',JSON.stringify(S.sueldos));
+    localStorage.setItem('mes',S.mes);
+    localStorage.setItem('saldoDA',S.saldoDA);
+    localStorage.setItem('saldoNA',S.saldoNA);
+    localStorage.setItem('tReal',S.tarjetaReal);
+    localStorage.setItem('formaPago',S.formaPago);
+    setSS('ok','Actualizado');
+    if(S.screen==='inicio') renderInicio();
+    if(S.screen==='resumen') renderResumen();
+  }catch(e){setSS('err','Error al cargar');}
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="D&N"/>
+<link rel="manifest" href="manifest.json"/>
+<title>D&N Finanzas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #0a0a0f;
+  --s1:       #12121a;
+  --s2:       #1c1c27;
+  --border:   rgba(255,255,255,0.08);
+  --text:     #f2f1fa;
+  --muted:    #6b6a80;
+  --dante:    #60a5fa;
+  --dante-bg: rgba(96,165,250,0.1);
+  --nicole:   #f472b6;
+  --nicole-bg:rgba(244,114,182,0.1);
+  --accent:   #c084fc;
+  --green:    #34d399;
+  --green-bg: rgba(52,211,153,0.1);
+  --amber:    #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --red:      #f87171;
+  --red-bg:   rgba(248,113,113,0.1);
+  --r:        18px;
+  --safe-t:   env(safe-area-inset-top,0px);
+  --safe-b:   env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;overscroll-behavior:none}
+
+/* ── APP SHELL ── */
+.app{display:flex;flex-direction:column;height:100dvh;max-width:420px;margin:0 auto}
+
+.topbar{
+  padding:calc(var(--safe-t) + 12px) 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);background:var(--bg);
+  position:sticky;top:0;z-index:50;
+}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.logo em{font-style:italic;color:var(--accent)}
+.sync-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:5px 10px;background:var(--s1);border:1px solid var(--border);border-radius:100px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sync-dot.spin{background:var(--amber);animation:pulse 1s infinite}
+.sync-dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.content{flex:1;overflow-y:auto;padding:16px 16px calc(72px + var(--safe-b))}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:420px;
+  background:rgba(18,18,26,0.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  padding:8px 0 calc(var(--safe-b) + 8px);
+  display:flex;justify-content:space-around;z-index:50;
+}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 12px;border-radius:12px;transition:color .2s}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav-btn.on{color:var(--accent)}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.on{display:block;animation:up .22s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--s1),#16162a);
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 20px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.hero::after{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(192,132,252,.08),transparent 70%)}
+.hero-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.hero-big{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* ── BALANCE PILL ── */
+.balance{width:100%;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:100px;font-size:14px;font-weight:500;margin-bottom:12px;border:1px solid}
+.balance.ok{background:var(--green-bg);color:var(--green);border-color:rgba(52,211,153,.2)}
+.balance.dante-owe{background:var(--dante-bg);color:var(--dante);border-color:rgba(96,165,250,.2)}
+.balance.nicole-owe{background:var(--nicole-bg);color:var(--nicole);border-color:rgba(244,114,182,.2)}
+.balance.neutral{background:var(--s1);color:var(--muted);border-color:var(--border)}
+
+/* ── PERSON SPLIT ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.person-card{padding:14px;border-radius:14px;border:1px solid}
+.person-card.d{background:var(--dante-bg);border-color:rgba(96,165,250,.2)}
+.person-card.n{background:var(--nicole-bg);border-color:rgba(244,114,182,.2)}
+.pc-name{font-size:11px;font-weight:600;letter-spacing:.06em;margin-bottom:6px}
+.d .pc-name{color:var(--dante)}.n .pc-name{color:var(--nicole)}
+.pc-amt{font-family:'Playfair Display',serif;font-size:22px;font-weight:700}
+.pc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.prog{height:4px;border-radius:2px;background:var(--s2);margin-top:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.d .prog-fill{background:var(--dante)}.n .prog-fill{background:var(--nicole)}
+
+/* ── TX LIST ── */
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px}
+.tx-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-desc{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.tx-amt{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;flex-shrink:0}
+.tx-amt.d{color:var(--dante)}.tx-amt.n{color:var(--nicole)}.tx-amt.t{color:var(--accent)}
+
+/* ── FORMS ── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-size:15px;font-family:'Outfit',sans-serif;-webkit-appearance:none;transition:border-color .2s}
+.fi:focus{outline:none;border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+select.fi{cursor:pointer}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--s2);color:var(--muted);cursor:pointer;transition:all .15s}
+.chip.on-d{background:var(--dante-bg);color:var(--dante);border-color:rgba(96,165,250,.3)}
+.chip.on-n{background:var(--nicole-bg);color:var(--nicole);border-color:rgba(244,114,182,.3)}
+.chip.on-a{background:rgba(192,132,252,.12);color:var(--accent);border-color:rgba(192,132,252,.3)}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:15px;border-radius:14px;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;border:none;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--accent);color:#0a0a0f}
+.btn-p:active{transform:scale(.98);opacity:.9}
+.btn-p:disabled{opacity:.4;cursor:not-allowed}
+.btn-s{background:var(--s2);color:var(--text);border:1px solid var(--border);margin-bottom:8px}
+
+/* ── CAT GRID ── */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.cat-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;border:1px solid var(--border);background:var(--s2);cursor:pointer;font-size:11px;color:var(--muted);transition:all .15s}
+.cat-btn .ce{font-size:22px}
+.cat-btn.on{background:rgba(192,132,252,.12);border-color:rgba(192,132,252,.3);color:var(--accent)}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(68px + var(--safe-b) + 10px);right:calc(50% - 200px + 16px);width:52px;height:52px;border-radius:50%;background:var(--accent);color:#0a0a0f;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(192,132,252,.35);transition:all .15s;z-index:40}
+.fab:active{transform:scale(.92)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.on{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--safe-b)+20px);width:100%;max-width:420px;max-height:92dvh;overflow-y:auto;transform:translateY(30px);transition:transform .3s}
+.overlay.on .modal{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:20px}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+
+/* ── SETTING ROWS ── */
+.sr{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.sr:last-child{border-bottom:none}
+.sr-label{font-size:14px}
+.sr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sr-val{font-size:14px;color:var(--accent);font-weight:500}
+
+/* ── TARJETA TOGGLE ── */
+.check-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--s2);border-radius:12px;border:1px solid var(--border);margin-bottom:8px}
+.check-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.check-desc{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.check-meta{font-size:11px;color:var(--muted)}
+.check-amt{font-size:14px;font-weight:600;margin-right:10px;flex-shrink:0}
+.toggle{width:42px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .2s;background:var(--s1);border:1px solid var(--border);flex-shrink:0}
+.toggle.on{background:var(--green);border-color:var(--green)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.toggle.on::after{transform:translateX(18px);background:#fff}
+
+/* ── SETUP ── */
+.setup-hero{text-align:center;padding:48px 20px 28px}
+.setup-icon{font-family:'Playfair Display',serif;font-size:56px;font-style:italic;color:var(--accent);line-height:1;margin-bottom:12px}
+.setup-title{font-family:'Playfair Display',serif;font-size:28px;margin-bottom:8px}
+.setup-sub{color:var(--muted);font-size:14px;line-height:1.6}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.step-n{width:26px;height:26px;border-radius:50%;background:rgba(192,132,252,.15);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-t{font-size:13px;line-height:1.6;color:var(--muted)}
+.step-t strong{color:var(--text)}
+.step-t a{color:var(--accent);text-decoration:none}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(72px + var(--safe-b) + 10px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--s1);border:1px solid var(--border);border-radius:100px;padding:9px 18px;font-size:13px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;z-index:300}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(52,211,153,.3);color:var(--green)}
+.toast.err{border-color:rgba(248,113,113,.3);color:var(--red)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-ico{font-size:38px;margin-bottom:10px}
+.empty-txt{font-size:13px;line-height:1.6}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:4px 0 14px}
+
+/* ── TARJETA CIERRE ── */
+.cierre-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.cierre-card{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.cierre-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.cierre-amt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">D<em>&</em>N</div>
+    <div class="sync-badge"><div class="sync-dot" id="syncDot"></div><span id="syncLbl">Conectado</span></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- SETUP -->
+    <div class="screen on" id="sc-setup">
+      <div class="setup-hero">
+        <div class="setup-icon">D&N</div>
+        <div class="setup-title">Finanzas en pareja</div>
+        <div class="setup-sub">Conectá la app con tu Google Sheet para que todo se sincronice automáticamente.</div>
+      </div>
+      <div class="step"><div class="step-n">1</div><div class="step-t">Entrá a <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a>, creá un proyecto y habilitá la <strong>Google Sheets API</strong>.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t">En <strong>Credenciales → Crear credencial → ID de cliente OAuth</strong>, elegí "Aplicación web" y agregá tu URL como origen autorizado.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t">Copiá el <strong>Client ID</strong> y el <strong>ID de tu Google Sheet</strong> (está en la URL entre <code>/d/</code> y <code>/edit</code>).</div></div>
+      <div style="height:16px"></div>
+      <div class="fg"><label>Google Client ID</label><input class="fi" id="setupCid" placeholder="xxxxx.apps.googleusercontent.com"/></div>
+      <div class="fg"><label>ID del Google Sheet</label><input class="fi" id="setupSid" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"/></div>
+      <button class="btn btn-p" onclick="doSetup()">Conectar y comenzar</button>
+    </div>
+
+    <!-- INICIO -->
+    <div class="screen" id="sc-inicio">
+      <div class="hero">
+        <div class="hero-label">Total gastos del mes</div>
+        <div class="hero-big" id="hTotal">$0</div>
+        <div class="hero-sub" id="hPeriod">–</div>
+      </div>
+      <div class="balance neutral" id="balancePill"><span id="balanceIco">⚖️</span><span id="balanceTxt">Calculando...</span></div>
+      <div class="split">
+        <div class="person-card d">
+          <div class="pc-name">DANTE</div>
+          <div class="pc-amt" id="dPago">$0</div>
+          <div class="pc-sub">pagó</div>
+          <div class="prog"><div class="prog-fill" id="dBar" style="width:0%"></div></div>
+        </div>
+        <div class="person-card n">
+          <div class="pc-name">NICOLE</div>
+          <div class="pc-amt" id="nPago">$0</div>
+          <div class="pc-sub">pagó</div>
+          <div class="prog"><div class="prog-fill" id="nBar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="sh"><span class="sh-title">Últimos movimientos</span></div>
+      <div class="tx-list" id="recentList"></div>
+    </div>
+
+    <!-- GASTOS -->
+    <div class="screen" id="sc-gastos">
+      <div class="sh" style="margin-bottom:14px">
+        <span class="sh-title">Todos los gastos</span>
+        <div class="chips" style="gap:6px">
+          <div class="chip on-a" id="fAll" onclick="setFilter('all')">Todos</div>
+          <div class="chip" id="fD" onclick="setFilter('dante')">Dante</div>
+          <div class="chip" id="fN" onclick="setFilter('nicole')">Nicole</div>
+        </div>
+      </div>
+      <div class="tx-list" id="gastosList"></div>
+    </div>
+
+    <!-- TARJETA -->
+    <div class="screen" id="sc-tarjeta">
+      <!-- Resumen rápido -->
+      <div class="cierre-row">
+        <div class="cierre-card">
+          <div class="cierre-label">Cargado</div>
+          <div class="cierre-amt" id="tCargado">$0</div>
+        </div>
+        <div class="cierre-card">
+          <div class="cierre-label">Total real</div>
+          <input class="fi" id="tReal" type="number" placeholder="0" style="font-family:'Playfair Display',serif;font-size:20px;padding:4px 8px;height:auto;background:transparent;border-color:var(--accent)" oninput="onTarjetaReal(this.value)"/>
+        </div>
+      </div>
+
+      <!-- Forma de pago -->
+      <div class="card">
+        <div class="card-label">¿Cómo se paga el resumen?</div>
+        <div class="chips" style="margin-bottom:14px">
+          <div class="chip" id="fp-d" onclick="setFormaPago('dante')">Dante pagó todo</div>
+          <div class="chip" id="fp-n" onclick="setFormaPago('nicole')">Nicole pagó todo</div>
+          <div class="chip" id="fp-p" onclick="setFormaPago('partes')">Cada uno una parte</div>
+        </div>
+        <div id="partesBlock" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="fg" style="margin-bottom:0">
+              <label>Dante pagó ($)</label>
+              <input class="fi" id="dPagoTarjeta" type="number" placeholder="0" oninput="onPagoTarjeta()"/>
+            </div>
+            <div class="fg" style="margin-bottom:0">
+              <label>Nicole pagó ($)</label>
+              <input class="fi" id="nPagoTarjeta" type="number" placeholder="0" oninput="onPagoTarjeta()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Le toca a cada uno -->
+      <div class="split">
+        <div class="person-card d">
+          <div class="pc-name">DANTE</div>
+          <div class="pc-amt" id="tDante">$0</div>
+          <div class="pc-sub">le toca</div>
+        </div>
+        <div class="person-card n">
+          <div class="pc-name">NICOLE</div>
+          <div class="pc-amt" id="tNicole">$0</div>
+          <div class="pc-sub">le toca</div>
+        </div>
+      </div>
+
+      <!-- Lista gastos tarjeta -->
+      <div class="sh"><span class="sh-title">Gastos cargados</span></div>
+      <div id="tarjetaList"></div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="screen" id="sc-resumen">
+      <div class="hero" style="margin-bottom:12px">
+        <div class="hero-label">Balance del mes</div>
+        <div class="hero-big" id="resAmt" style="font-size:28px;line-height:1.2">–</div>
+        <div class="hero-sub" id="resSub">–</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Por categoría</div>
+        <div id="resCats"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Sueldos</div>
+        <div class="sr"><div><div class="sr-label">Dante</div><div class="sr-sub" id="resDpct">–</div></div><div class="sr-val" id="resDsueldo">$0</div></div>
+        <div class="sr"><div><div class="sr-label">Nicole</div><div class="sr-sub" id="resNpct">–</div></div><div class="sr-val" id="resNsueldo">$0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Detalle de pagos</div>
+        <div class="sr"><div><div class="sr-label">Dante pagó</div><div class="sr-sub">le correspondía <span id="resDdebe">$0</span></div></div><div class="sr-val" id="resDpago">$0</div></div>
+        <div class="sr"><div><div class="sr-label">Nicole pagó</div><div class="sr-sub">le correspondía <span id="resNdebe">$0</span></div></div><div class="sr-val" id="resNpago">$0</div></div>
+      </div>
+
+      <!-- Saldo mes anterior -->
+      <div class="card">
+        <div class="card-label">Saldo mes anterior</div>
+        <div class="sr">
+          <div class="sr-label">Dante le debe a Nicole</div>
+          <input class="fi" id="saldoDA" type="number" placeholder="0" style="width:120px;text-align:right;font-size:14px;padding:6px 10px" oninput="onSaldoAnt()"/>
+        </div>
+        <div class="sr">
+          <div class="sr-label">Nicole le debe a Dante</div>
+          <input class="fi" id="saldoNA" type="number" placeholder="0" style="width:120px;text-align:right;font-size:14px;padding:6px 10px" oninput="onSaldoAnt()"/>
+        </div>
+      </div>
+
+      <button class="btn btn-s" onclick="loadFromSheet()">🔄 Actualizar desde Sheet</button>
+      <button class="btn btn-p" onclick="writeToSheet()">↑ Sincronizar con Drive</button>
+    </div>
+
+    <!-- AJUSTES -->
+    <div class="screen" id="sc-ajustes">
+      <div class="card">
+        <div class="card-label">Sueldos</div>
+        <div class="fg"><label>Sueldo Dante ($)</label><input class="fi" id="ajD" type="number" oninput="onSueldo()"/></div>
+        <div class="fg" style="margin-bottom:0"><label>Sueldo Nicole ($)</label><input class="fi" id="ajN" type="number" oninput="onSueldo()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Período</div>
+        <div class="fg" style="margin-bottom:0"><label>Mes actual</label><input class="fi" id="ajMes" placeholder="Junio 2026" oninput="onMes()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Conexión</div>
+        <div class="sr"><div><div class="sr-label">Google Sheet</div><div class="sr-sub" id="sheetDisp">–</div></div><div class="sr-val" id="connSt">–</div></div>
+        <div class="sr"><div><div class="sr-label">Cuenta Google</div><div class="sr-sub" id="googleUser">No conectado</div></div><button class="btn btn-s" style="width:auto;padding:7px 14px;font-size:12px;margin:0" onclick="reconnect()">Reconectar</button></div>
+      </div>
+      <button class="btn btn-p" onclick="writeToSheet()">↑ Sincronizar con Drive</button>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openModal()" style="display:none">+</button>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn on" id="nb-inicio" onclick="go('inicio')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio
+    </button>
+    <button class="nav-btn" id="nb-gastos" onclick="go('gastos')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Gastos
+    </button>
+    <button class="nav-btn" id="nb-tarjeta" onclick="go('tarjeta')">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="7" cy="15" r="1" fill="currentColor"/></svg>Tarjeta
+    </button>
+    <button class="nav-btn" id="nb-resumen" onclick="go('resumen')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Resumen
+    </button>
+    <button class="nav-btn" id="nb-ajustes" onclick="go('ajustes')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ajustes
+    </button>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MODAL NUEVO GASTO -->
+  <div class="overlay" id="overlay" onclick="closeOverlay(event)">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Nuevo gasto</div>
+      <div class="fg">
+        <label>Tipo</label>
+        <div class="chips">
+          <div class="chip" id="tp-fijo" onclick="setTipo('fijo')">📌 Fijo</div>
+          <div class="chip" id="tp-variable" onclick="setTipo('variable')">🔄 Variable</div>
+          <div class="chip" id="tp-diario" onclick="setTipo('diario')">🛒 Diario</div>
+          <div class="chip" id="tp-tarjeta" onclick="setTipo('tarjeta')">💳 Tarjeta</div>
+        </div>
+      </div>
+      <div class="fg"><label>Descripción</label><input class="fi" id="mDesc" placeholder="Ej: Supermercado" autocomplete="off"/></div>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-btn" onclick="setCat('🛒','Supermercado')"><span class="ce">🛒</span>Super</div>
+        <div class="cat-btn" onclick="setCat('🍽️','Restaurante')"><span class="ce">🍽️</span>Resto</div>
+        <div class="cat-btn" onclick="setCat('🏠','Hogar')"><span class="ce">🏠</span>Hogar</div>
+        <div class="cat-btn" onclick="setCat('💡','Servicios')"><span class="ce">💡</span>Servicios</div>
+        <div class="cat-btn" onclick="setCat('🚗','Transporte')"><span class="ce">🚗</span>Transporte</div>
+        <div class="cat-btn" onclick="setCat('🎬','Entrete.')"><span class="ce">🎬</span>Entrete.</div>
+        <div class="cat-btn" onclick="setCat('🏥','Salud')"><span class="ce">🏥</span>Salud</div>
+        <div class="cat-btn" onclick="setCat('✈️','Viajes')"><span class="ce">✈️</span>Viajes</div>
+        <div class="cat-btn on" onclick="setCat('📦','Otros')"><span class="ce">📦</span>Otros</div>
+      </div>
+      <div class="fg" id="pagadorFg">
+        <label>¿Quién pagó?</label>
+        <div class="chips">
+          <div class="chip on-d" id="pg-dante" onclick="setPag('Dante')">Dante</div>
+          <div class="chip" id="pg-nicole" onclick="setPag('Nicole')">Nicole</div>
+        </div>
+      </div>
+      <div class="fg"><label>Monto ($)</label><input class="fi" id="mMonto" type="number" placeholder="0" style="font-size:24px;font-family:'Playfair Display',serif"/></div>
+      <div class="fg"><label>Fecha</label><input class="fi" id="mFecha" type="date"/></div>
+      <button class="btn btn-p" onclick="saveGasto()">Guardar</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const S = {
+  clientId:    localStorage.getItem('cid') || '',
+  sheetId:     localStorage.getItem('sid') || '',
+  token:       localStorage.getItem('token') || null,
+  tokenExp:    parseInt(localStorage.getItem('tokenExp') || '0'),
+  gastos:      JSON.parse(localStorage.getItem('gastos') || '[]'),
+  tarjeta:     JSON.parse(localStorage.getItem('tarjeta') || '[]'),
+  tarjetaReal: parseFloat(localStorage.getItem('tReal') || '0'),
+  formaPago:   localStorage.getItem('formaPago') || 'dante',
+  dPagoTarjeta: parseFloat(localStorage.getItem('dPagoTarjeta') || '0'),
+  nPagoTarjeta: parseFloat(localStorage.getItem('nPagoTarjeta') || '0'),
+  sueldos:     JSON.parse(localStorage.getItem('sueldos') || '{"d":1000000,"n":500000}'),
+  mes:         localStorage.getItem('mes') || 'Junio 2026',
+  saldoDA:     parseFloat(localStorage.getItem('saldoDA') || '0'),
+  saldoNA:     parseFloat(localStorage.getItem('saldoNA') || '0'),
+  screen:      'setup',
+  filter:      'all',
+  ng:          { tipo:'diario', cat:'📦', catLabel:'Otros', pag:'Dante' },
+  _psync:      false, _pload: false,
+};
+
+const fmt = n => '$' + Math.round(n||0).toLocaleString('es-AR');
+const today = () => new Date().toISOString().split('T')[0];
+const pct = () => {
+  const t = S.sueldos.d + S.sueldos.n;
+  return t > 0 ? { d: S.sueldos.d/t, n: S.sueldos.n/t } : { d:.5, n:.5 };
+};
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+let tokenClient;
+
+function doSetup() {
+  const cid = document.getElementById('setupCid').value.trim();
+  const sid = document.getElementById('setupSid').value.trim();
+  if (!cid || !sid) { toast('Completá los dos campos','err'); return; }
+  S.clientId = cid; S.sheetId = sid;
+  localStorage.setItem('cid', cid); localStorage.setItem('sid', sid);
+  initAuth();
+}
+
+function initAuth() {
+  if (!S.clientId) return;
+  const checkGSI = setInterval(() => {
+    if (!window.google?.accounts?.oauth2) return;
+    clearInterval(checkGSI);
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: S.clientId,
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: resp => {
+        if (resp.error) { setSS('err','Error auth'); return; }
+        S.token = resp.access_token;
+        S.tokenExp = Date.now() + 55*60*1000;
+        localStorage.setItem('token', S.token);
+        localStorage.setItem('tokenExp', S.tokenExp);
+        setSS('ok','Conectado');
+        document.getElementById('connSt').textContent = '✓ OK';
+        fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?access_token='+S.token)
+          .then(r=>r.json()).then(d=>{ document.getElementById('googleUser').textContent = d.email||'Conectado'; }).catch(()=>{});
+        if (S._psync) { S._psync=false; writeToSheet(); return; }
+        if (S._pload) { S._pload=false; loadFromSheet(); return; }
+        go('inicio'); loadFromSheet();
+      }
+    });
+    if (S.token && Date.now() < S.tokenExp) {
+      go('inicio');
+    } else {
+      tokenClient.requestAccessToken({ prompt:'' });
+    }
+  }, 150);
+}
+
+function ensureToken(then) {
+  if (S.token && Date.now() < S.tokenExp) { then(); return; }
+  if (!tokenClient) { toast('Reconectá en Ajustes','err'); return; }
+  S._psync = (then === 'sync');
+  S._pload = (then === 'load');
+  if (then !== 'sync' && then !== 'load') {
+    const orig = then;
+    tokenClient._cb_override = orig;
+  }
+  tokenClient.requestAccessToken({ prompt:'' });
+}
+
+function reconnect() {
+  if (!tokenClient) { initAuth(); return; }
+  tokenClient.requestAccessToken({ prompt:'select_account' });
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function go(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sc-'+name).classList.add('on');
+  const nb = document.getElementById('nb-'+name);
+  if (nb) nb.classList.add('on');
+  S.screen = name;
+  const fab = document.getElementById('fab');
+  fab.style.display = ['inicio','gastos','tarjeta'].includes(name) ? 'flex' : 'none';
+  if (name==='inicio')  renderInicio();
+  if (name==='gastos')  renderGastos();
+  if (name==='tarjeta') renderTarjeta();
+  if (name==='resumen') renderResumen();
+  if (name==='ajustes') renderAjustes();
+}
+
+// ═══════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════
+function openModal() {
+  document.getElementById('mDesc').value='';
+  document.getElementById('mMonto').value='';
+  document.getElementById('mFecha').value=today();
+  setTipo(S.screen==='tarjeta'?'tarjeta':'diario');
+  setCat('📦','Otros');
+  setPag('Dante');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('on'); }
+function closeOverlay(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function setTipo(t) {
+  S.ng.tipo=t;
+  ['fijo','variable','diario','tarjeta'].forEach(x=>{
+    document.getElementById('tp-'+x).className='chip'+(x===t?' on-a':'');
+  });
+  document.getElementById('pagadorFg').style.display = t==='tarjeta'?'none':'block';
+}
+function setCat(e,l) {
+  S.ng.cat=e; S.ng.catLabel=l;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('on'));
+  event.currentTarget.classList.add('on');
+}
+function setPag(p) {
+  S.ng.pag=p;
+  document.getElementById('pg-dante').className='chip'+(p==='Dante'?' on-d':'');
+  document.getElementById('pg-nicole').className='chip'+(p==='Nicole'?' on-n':'');
+}
+
+// ═══════════════════════════════════════════════
+// SAVE GASTO
+// ═══════════════════════════════════════════════
+function saveGasto() {
+  const desc = document.getElementById('mDesc').value.trim();
+  const monto = parseFloat(document.getElementById('mMonto').value)||0;
+  const fecha = document.getElementById('mFecha').value;
+  if (!desc||monto<=0) { toast('Completá descripción y monto','err'); return; }
+  const g = { id:Date.now(), desc, monto, fecha, tipo:S.ng.tipo, cat:S.ng.cat, catLabel:S.ng.catLabel,
+    pagador: S.ng.tipo==='tarjeta'?'Tarjeta':S.ng.pag, consolidado:false };
+  if (g.tipo==='tarjeta') { S.tarjeta.push(g); localStorage.setItem('tarjeta',JSON.stringify(S.tarjeta)); }
+  else { S.gastos.push(g); localStorage.setItem('gastos',JSON.stringify(S.gastos)); }
+  closeModal(); toast('Guardado ✓','ok');
+  writeToSheetD();
+  if (S.screen==='inicio') renderInicio();
+  if (S.screen==='gastos') renderGastos();
+  if (S.screen==='tarjeta') renderTarjeta();
+}
+
+// ═══════════════════════════════════════════════
+// TARJETA
+// ═══════════════════════════════════════════════
+function setFormaPago(fp) {
+  S.formaPago = fp;
+  localStorage.setItem('formaPago', fp);
+  ['d','n','p'].forEach(x => document.getElementById('fp-'+x).className='chip');
+  document.getElementById('fp-'+fp[0]).className='chip on-a';
+  document.getElementById('partesBlock').style.display = fp==='partes'?'block':'none';
+  calcTarjetaPagos();
+  writeToSheetD();
+}
+
+function onTarjetaReal(v) {
+  S.tarjetaReal = parseFloat(v)||0;
+  localStorage.setItem('tReal', S.tarjetaReal);
+  calcTarjetaPagos();
+  if (S.screen==='tarjeta') renderTarjetaSplit();
+  writeToSheetD();
+}
+
+function onPagoTarjeta() {
+  S.dPagoTarjeta = parseFloat(document.getElementById('dPagoTarjeta').value)||0;
+  S.nPagoTarjeta = parseFloat(document.getElementById('nPagoTarjeta').value)||0;
+  localStorage.setItem('dPagoTarjeta', S.dPagoTarjeta);
+  localStorage.setItem('nPagoTarjeta', S.nPagoTarjeta);
+  writeToSheetD();
+}
+
+function calcTarjetaPagos() {
+  const p = pct();
+  const base = S.tarjetaReal;
+  if (S.formaPago==='dante') {
+    S.dPagoTarjeta = base; S.nPagoTarjeta = 0;
+  } else if (S.formaPago==='nicole') {
+    S.dPagoTarjeta = 0; S.nPagoTarjeta = base;
+  }
+  // partes: usar lo que ingresaron manualmente
+}
+
+function onSaldoAnt() {
+  S.saldoDA = parseFloat(document.getElementById('saldoDA').value)||0;
+  S.saldoNA = parseFloat(document.getElementById('saldoNA').value)||0;
+  localStorage.setItem('saldoDA', S.saldoDA);
+  localStorage.setItem('saldoNA', S.saldoNA);
+  writeToSheetD();
+}
+
+function onSueldo() {
+  S.sueldos.d = parseFloat(document.getElementById('ajD').value)||0;
+  S.sueldos.n = parseFloat(document.getElementById('ajN').value)||0;
+  localStorage.setItem('sueldos', JSON.stringify(S.sueldos));
+  writeToSheetD();
+}
+
+function onMes() {
+  S.mes = document.getElementById('ajMes').value;
+  localStorage.setItem('mes', S.mes);
+  writeToSheetD();
+}
+
+// ═══════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════
+function setFilter(f) {
+  S.filter=f;
+  ['All','D','N'].forEach(x=>{
+    const id='f'+x; const el=document.getElementById(id);
+    const v=x==='All'?'all':x==='D'?'dante':'nicole';
+    el.className='chip'+(v===f?' on-'+(v==='all'?'a':v==='dante'?'d':'n'):'');
+  });
+  renderGastos();
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderInicio() {
+  const p = pct();
+  const totalG = S.gastos.reduce((a,g)=>a+g.monto,0);
+  const tReal = S.tarjetaReal||0;
+  const dPag = S.gastos.filter(g=>g.pagador==='Dante').reduce((a,g)=>a+g.monto,0) + (S.dPagoTarjeta||0);
+  const nPag = S.gastos.filter(g=>g.pagador==='Nicole').reduce((a,g)=>a+g.monto,0) + (S.nPagoTarjeta||0);
+  const dDebe = totalG*p.d + tReal*p.d + (S.saldoDA||0) - (S.saldoNA||0);
+  const nDebe = totalG*p.n + tReal*p.n + (S.saldoNA||0) - (S.saldoDA||0);
+  const diff = dPag - dDebe;
+
+  document.getElementById('hTotal').textContent = fmt(totalG + tReal);
+  document.getElementById('hPeriod').textContent = S.mes + (tReal>0?' · Tarjeta incluida':'');
+  document.getElementById('dPago').textContent = fmt(dPag);
+  document.getElementById('nPago').textContent = fmt(nPag);
+  const mx = Math.max(dPag,nPag,1);
+  document.getElementById('dBar').style.width=(dPag/mx*100)+'%';
+  document.getElementById('nBar').style.width=(nPag/mx*100)+'%';
+
+  const pill=document.getElementById('balancePill');
+  const txt=document.getElementById('balanceTxt');
+  if (Math.abs(diff)<1) {
+    pill.className='balance ok'; txt.textContent='✓ Todo equilibrado este mes';
+  } else if (diff>0) {
+    pill.className='balance nicole-owe'; txt.textContent=`Nicole le debe a Dante ${fmt(diff)}`;
+  } else {
+    pill.className='balance dante-owe'; txt.textContent=`Dante le debe a Nicole ${fmt(Math.abs(diff))}`;
+  }
+
+  const recent=[...S.gastos].sort((a,b)=>b.id-a.id).slice(0,8);
+  const list=document.getElementById('recentList');
+  list.innerHTML = recent.length ? recent.map(txHtml).join('') :
+    '<div class="empty"><div class="empty-ico">🌿</div><div class="empty-txt">Sin gastos todavía.<br>Tocá + para agregar.</div></div>';
+}
+
+function txHtml(g) {
+  const cls=g.pagador==='Dante'?'d':g.pagador==='Nicole'?'n':'t';
+  const bg={'d':'var(--dante-bg)','n':'var(--nicole-bg)','t':'rgba(192,132,252,.1)'};
+  return `<div class="tx">
+    <div class="tx-ico" style="background:${bg[cls]}">${g.cat}</div>
+    <div class="tx-info">
+      <div class="tx-desc">${g.desc}</div>
+      <div class="tx-meta">${g.pagador} · ${g.catLabel} · ${g.fecha?g.fecha.slice(5).replace('-','/'):'–'}</div>
+    </div>
+    <div class="tx-amt ${cls}">${fmt(g.monto)}</div>
+  </div>`;
+}
+
+function renderGastos() {
+  let items=[...S.gastos].sort((a,b)=>b.id-a.id);
+  if (S.filter==='dante') items=items.filter(g=>g.pagador==='Dante');
+  if (S.filter==='nicole') items=items.filter(g=>g.pagador==='Nicole');
+  const el=document.getElementById('gastosList');
+  el.innerHTML=items.length?items.map(txHtml).join(''):
+    '<div class="empty"><div class="empty-ico">💸</div><div class="empty-txt">Sin gastos con este filtro.</div></div>';
+}
+
+function renderTarjeta() {
+  const total=S.tarjeta.reduce((a,g)=>a+g.monto,0);
+  document.getElementById('tCargado').textContent=fmt(total);
+  document.getElementById('tReal').value=S.tarjetaReal||'';
+  // Forma de pago
+  ['d','n','p'].forEach(x=>document.getElementById('fp-'+x).className='chip');
+  const fp=S.formaPago==='dante'?'d':S.formaPago==='nicole'?'n':'p';
+  document.getElementById('fp-'+fp).className='chip on-a';
+  document.getElementById('partesBlock').style.display=S.formaPago==='partes'?'block':'none';
+  if (S.formaPago==='partes') {
+    document.getElementById('dPagoTarjeta').value=S.dPagoTarjeta||'';
+    document.getElementById('nPagoTarjeta').value=S.nPagoTarjeta||'';
+  }
+  renderTarjetaSplit();
+  // Lista
+  const list=document.getElementById('tarjetaList');
+  if (!S.tarjeta.length) {
+    list.innerHTML='<div class="empty"><div class="empty-ico">💳</div><div class="empty-txt">Sin gastos con tarjeta todavía.</div></div>';
+    return;
+  }
+  list.innerHTML=S.tarjeta.sort((a,b)=>b.id-a.id).map(g=>`
+    <div class="check-row">
+      <div class="check-left">
+        <span style="font-size:20px">${g.cat}</span>
+        <div style="min-width:0">
+          <div class="check-desc">${g.desc}</div>
+          <div class="check-meta">${g.catLabel} · ${g.fecha?g.fecha.slice(5).replace('-','/'):'–'}</div>
+        </div>
+      </div>
+      <span class="check-amt">${fmt(g.monto)}</span>
+      <button class="toggle ${g.consolidado?'on':''}" onclick="toggleCons(${g.id})"></button>
+    </div>`).join('');
+}
+
+function renderTarjetaSplit() {
+  const p=pct();
+  const base=S.tarjetaReal||S.tarjeta.reduce((a,g)=>a+g.monto,0);
+  document.getElementById('tDante').textContent=fmt(base*p.d);
+  document.getElementById('tNicole').textContent=fmt(base*p.n);
+}
+
+function toggleCons(id) {
+  const g=S.tarjeta.find(x=>x.id===id);
+  if(g){g.consolidado=!g.consolidado;localStorage.setItem('tarjeta',JSON.stringify(S.tarjeta));renderTarjeta();}
+}
+
+function renderResumen() {
+  const p=pct();
+  const totalG=S.gastos.reduce((a,g)=>a+g.monto,0);
+  const tReal=S.tarjetaReal||0;
+  const dPag=S.gastos.filter(g=>g.pagador==='Dante').reduce((a,g)=>a+g.monto,0)+(S.dPagoTarjeta||0);
+  const nPag=S.gastos.filter(g=>g.pagador==='Nicole').reduce((a,g)=>a+g.monto,0)+(S.nPagoTarjeta||0);
+  const dDebe=totalG*p.d+tReal*p.d+(S.saldoDA||0)-(S.saldoNA||0);
+  const nDebe=totalG*p.n+tReal*p.n+(S.saldoNA||0)-(S.saldoDA||0);
+  const diff=dPag-dDebe;
+
+  const amt=document.getElementById('resAmt');
+  const sub=document.getElementById('resSub');
+  if(Math.abs(diff)<1){amt.textContent='✓ Equilibrado';amt.style.color='var(--green)';sub.textContent='Dante y Nicole están al día';}
+  else if(diff>0){amt.textContent=fmt(diff);amt.style.color='var(--nicole)';sub.textContent='Nicole le debe a Dante';}
+  else{amt.textContent=fmt(Math.abs(diff));amt.style.color='var(--dante)';sub.textContent='Dante le debe a Nicole';}
+
+  document.getElementById('resDsueldo').textContent=fmt(S.sueldos.d);
+  document.getElementById('resNsueldo').textContent=fmt(S.sueldos.n);
+  document.getElementById('resDpct').textContent=(p.d*100).toFixed(1)+'% del hogar';
+  document.getElementById('resNpct').textContent=(p.n*100).toFixed(1)+'% del hogar';
+  document.getElementById('resDpago').textContent=fmt(dPag);
+  document.getElementById('resNpago').textContent=fmt(nPag);
+  document.getElementById('resDdebe').textContent=fmt(dDebe);
+  document.getElementById('resNdebe').textContent=fmt(nDebe);
+
+  // Saldo anterior
+  document.getElementById('saldoDA').value=S.saldoDA||'';
+  document.getElementById('saldoNA').value=S.saldoNA||'';
+
+  // Categorías
+  const cats={};
+  S.gastos.forEach(g=>{if(!cats[g.catLabel])cats[g.catLabel]={e:g.cat,t:0};cats[g.catLabel].t+=g.monto;});
+  if(tReal>0)cats['Tarjeta']={e:'💳',t:tReal};
+  document.getElementById('resCats').innerHTML=Object.entries(cats).sort((a,b)=>b[1].t-a[1].t)
+    .map(([k,v])=>`<div class="sr" style="padding:10px 0"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">${v.e}</span><span style="font-size:14px">${k}</span></div><span style="font-size:14px;font-weight:600;color:var(--accent)">${fmt(v.t)}</span></div>`).join('')
+    ||'<div style="color:var(--muted);font-size:13px;padding:8px 0">Sin datos todavía</div>';
+}
+
+function renderAjustes() {
+  document.getElementById('ajD').value=S.sueldos.d||'';
+  document.getElementById('ajN').value=S.sueldos.n||'';
+  document.getElementById('ajMes').value=S.mes;
+  document.getElementById('sheetDisp').textContent=S.sheetId?S.sheetId.slice(0,22)+'...':'No configurado';
+  document.getElementById('connSt').textContent=S.token?'✓ Activo':'✗ Sin token';
+}
+
+// ═══════════════════════════════════════════════
+// GOOGLE SHEETS SYNC
+// ═══════════════════════════════════════════════
+function setSS(state,label) {
+  const dot=document.getElementById('syncDot');
+  dot.className='sync-dot'+(state==='spin'?' spin':state==='err'?' err':'');
+  document.getElementById('syncLbl').textContent=label;
+}
+
+async function apiCall(method,path,body) {
+  if(!S.token||!S.sheetId) return null;
+  try {
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${S.sheetId}${path}`,{
+      method, headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json'},
+      body:body?JSON.stringify(body):undefined
+    });
+    if(r.status===401){S.token=null;S.tokenExp=0;setSS('err','Sesión expirada');return null;}
+    return await r.json();
+  } catch(e){setSS('err','Sin internet');return null;}
+}
+
+async function writeToSheet() {
+  if(!S.token||Date.now()>S.tokenExp){S._psync=true;if(tokenClient)tokenClient.requestAccessToken({prompt:''});else initAuth();return;}
+  if(!S.sheetId){toast('Configurá el Sheet primero','err');return;}
+  setSS('spin','Sincronizando...');
+  try {
+    // Sueldos, mes, saldo anterior
+    await apiCall('PUT','/values:batchUpdate',{
+      valueInputOption:'RAW',
+      data:[
+        {range:"'💰 Sueldos'!B5",  values:[[S.mes]]},
+        {range:"'💰 Sueldos'!B9",  values:[[S.sueldos.d]]},
+        {range:"'💰 Sueldos'!B10", values:[[S.sueldos.n]]},
+        {range:"'💰 Sueldos'!B24", values:[[S.saldoDA||0]]},
+        {range:"'💰 Sueldos'!B25", values:[[S.saldoNA||0]]},
+        {range:"'💳 Tarjeta'!B43", values:[[S.tarjetaReal||'']]},
+        {range:"'💳 Tarjeta'!B56", values:[[
+          S.formaPago==='dante'?'Dante pagó todo':
+          S.formaPago==='nicole'?'Nicole pagó todo':'Cada uno pagó una parte'
+        ]]},
+        // Si partes, escribir los montos manuales en C59 y C60
+        ...(S.formaPago==='partes'?[
+          {range:"'💳 Tarjeta'!C59", values:[[S.dPagoTarjeta||'']]},
+          {range:"'💳 Tarjeta'!C60", values:[[S.nPagoTarjeta||'']]},
+        ]:[]),
+      ]
+    });
+
+    // Gastos por tipo - usar batchUpdate para evitar problemas con emojis en URLs
+    const tipoRanges = {
+      fijo:     {clear:"'📌 Gastos Fijos'!A4:C23", write:"'📌 Gastos Fijos'!A4"},
+      variable: {clear:"'🔄 Gastos Variables'!A4:C23", write:"'🔄 Gastos Variables'!A4"},
+      diario:   {clear:"'🛒 Gastos Diarios'!A4:C23", write:"'🛒 Gastos Diarios'!A4"},
+    };
+    // Clear all gastos sheets in one batchUpdate
+    const clearData = Object.values(tipoRanges).map(r=>({range:r.clear,values:[]}));
+    clearData.push({range:"'💳 Tarjeta'!A6:E35",values:[]});
+    await apiCall('POST','/values:batchClear',{ranges:[...Object.values(tipoRanges).map(r=>r.clear),"'💳 Tarjeta'!A6:E35"]});
+
+    // Write gastos in one batchUpdate
+    const writeData = [];
+    for(const [tipo,r] of Object.entries(tipoRanges)){
+      const items=S.gastos.filter(g=>g.tipo===tipo);
+      if(items.length) writeData.push({range:r.write, values:items.slice(0,20).map(g=>[g.desc,g.pagador,g.monto])});
+    }
+    if(S.tarjeta.length){
+      writeData.push({range:"'💳 Tarjeta'!A6", values:S.tarjeta.slice(0,30).map(g=>[
+        g.fecha?g.fecha.slice(5).replace('-','/'):'',
+        g.desc, g.catLabel, g.monto,
+        g.consolidado?'✓ Sí':'Pendiente'
+      ])});
+    }
+    if(writeData.length){
+      await apiCall('POST','/values:batchUpdate',{valueInputOption:'RAW',data:writeData});
+    }
+
+    setSS('ok','Sincronizado');
+    toast('Drive actualizado ✓','ok');
+  } catch(e){setSS('err','Error al sincronizar');toast('Error al sincronizar','err');}
+}
+
+async function loadFromSheet() {
+  if(!S.token||Date.now()>S.tokenExp){S._pload=true;if(tokenClient)tokenClient.requestAccessToken({prompt:''});else initAuth();return;}
+  if(!S.sheetId) return;
+  setSS('spin','Cargando...');
+  // batchGet with ranges as JSON body workaround not possible - use individual gets
+  // Use batchGet with proper encoding
+  const rangeList=[
+    "'💰 Sueldos'!B5","'💰 Sueldos'!B9","'💰 Sueldos'!B10",
+    "'💰 Sueldos'!B24","'💰 Sueldos'!B25",
+    "'💳 Tarjeta'!B43","'💳 Tarjeta'!B56"
+  ];
+  const ranges=rangeList.map(r=>'ranges='+encodeURIComponent(r)).join('&');
+  const res=await apiCall('GET',`/values:batchGet?${ranges}`);
+  if(!res) return;
+  try {
+    const v=res.valueRanges;
+    S.mes         = v[0]?.values?.[0]?.[0]||S.mes;
+    S.sueldos.d   = parseFloat(v[1]?.values?.[0]?.[0])||S.sueldos.d;
+    S.sueldos.n   = parseFloat(v[2]?.values?.[0]?.[0])||S.sueldos.n;
+    S.saldoDA     = parseFloat(v[3]?.values?.[0]?.[0])||0;
+    S.saldoNA     = parseFloat(v[4]?.values?.[0]?.[0])||0;
+    S.tarjetaReal = parseFloat(v[5]?.values?.[0]?.[0])||0;
+    const fp=v[6]?.values?.[0]?.[0]||'';
+    S.formaPago = fp==='Nicole pagó todo'?'nicole':fp==='Cada uno pagó una parte'?'partes':'dante';
+    localStorage.setItem('sueldos',JSON.stringify(S.sueldos));
+    localStorage.setItem('mes',S.mes);
+    localStorage.setItem('saldoDA',S.saldoDA);
+    localStorage.setItem('saldoNA',S.saldoNA);
+    localStorage.setItem('tReal',S.tarjetaReal);
+    localStorage.setItem('formaPago',S.formaPago);
+    setSS('ok','Actualizado');
+    if(S.screen==='inicio') renderInicio();
+    if(S.screen==='resumen') renderResumen();
+  } catch(e){setSS('err','Error al cargar');}
+}
+
+let dbTimer;
+function writeToSheetD(){clearTimeout(dbTimer);dbTimer=setTimeout(writeToSheet,1400);}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let tTimer;
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=(type==='ok'?'✓ ':'✗ ')+msg;
+  t.className=`toast on ${type}`;
+  clearTimeout(tTimer);
+  tTimer=setTimeout(()=>t.classList.remove('on'),2600);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  document.getElementById('mFecha').value=today();
+  setTipo('diario'); setPag('Dante');
+
+  if(S.clientId&&S.sheetId){
+    go('inicio');
+    initAuth();
+  }
+  // Register service worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/dn-finanzas/sw.js').catch(()=>{});
+  }
+});
+</script>
+</body>
+</html>
